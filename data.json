@@ -1,0 +1,16 @@
+{
+  "description": {"domain": "amazon.co.jp", "start": "2013-10-01", "end": "2013-10-31"},
+  "tree": {
+    "root": [{"name": "amazon.co.jp"}],
+    "amazon.co.jp": [{"name": "www.amazon.co.jp"}],
+	"www.amazon.co.jp": [{"name": "www.amazon.co.jp/gp"}, {"name": "www.amazon.co.jp/In-English"}],
+    "www.amazon.co.jp/gp": [],
+    "www.amazon.co.jp/In-English": []
+  },
+  "scores": {
+    "amazon.co.jp": {"population": 20000000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
+    "www.amazon.co.jp": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
+    "www.amazon.co.jp/gp": {"population": 100000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
+    "www.amazon.co.jp/In-English": {"population": 10000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}}
+  }
+}

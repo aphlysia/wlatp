@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<div id="body" style="position: absolute; top:80px">
+<div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; width: 300px; padding: 10px;">
+	<div id="toolTip_header" class="tooltip_header"></div>
+	<div id="toolTip_population" class="tooltip_population"></div>
+	<div id="toolTip_charts" class="tooltip_charts">
+	</div>
+</div>
+</div>
+<script src="d3.v3.min.js"></script>
+<script>
+
+var width = 960,
+    height = 900;
+
+var cluster = d3.layout.cluster()
+    .size([height, width - 200]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("#body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(100,0)");
+
+d3.json("data.json", function(error, data) {
+  tree = data.tree;
+  scores = data.scores;
+  cluster.children(function (node) {return tree[node.name];});
+  var nodes = cluster.nodes(tree.root[0]);
+  var links = cluster.links(nodes);
+
+  var link = svg.selectAll(".link")
+      .data(links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", diagonal);
+
+  var node = svg.selectAll(".node")
+      .data(nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")";});
+
+  var toolTip = d3.select("#toolTip");
+
+  node.append("circle")
+      .attr("r", function(d) {return Math.sqrt(scores[d.name]["population"] / 5000) + 4.5;})
+	  .on("mouseover", function(d) {node_onMouseOver(d);})
+	  .on("mouseout", function(d) {toolTip.transition().duration(500).style("opacity", "0");});
+
+  node.append("text")
+      .attr("dx", -30)
+      .attr("dy", 25)
+      .style("text-anchor", "start")
+      .text(function(d) {return d.name;});
+
+  function node_onMouseOver(node) {
+    toolTip.transition().duration(200).style("opacity", ".9");
+	d3.select("#toolTip_header").text(node.name);
+	d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
+	var x = d3.keys(scores[node.name]).sort();
+	var p = d3.select("#toolTip_charts").selectAll("div")
+		.data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
+	p.enter().append("div").attr("class", "toolTip_chart")
+	    .text(function(d) {return d;})
+	p.exit().remove();
+	toolTip.style("left", (d3.event.pageX + 15) + "px")
+	    .style("top", (d3.event.pageY - 75) + "px");
+  }
+});
+
+d3.select(self.frameElement).style("height", height + "px");
+
+</script>
+</body>
+</html>
+
+
+

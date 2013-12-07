@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<head>
 <meta charset="utf-8">
 <style>
 
@@ -19,9 +20,11 @@
 }
 
 </style>
+<link rel="stylesheet" href="css/nv.d3.min.css" tyep="text/css" />
+</head>
 <body>
 <div id="body" style="position: absolute;">
-<div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; width: 300px; padding: 10px;">
+<div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; padding: 10px;">
 	<div id="toolTip_header" class="tooltip_header"></div>
 	<div id="toolTip_population" class="tooltip_population"></div>
 	<div id="toolTip_charts" class="tooltip_charts">
@@ -29,6 +32,7 @@
 </div>
 </div>
 <script src="js/d3.v3.min.js"></script>
+<script src="js/nv.d3.min.js"></script>
 <script>
 
 var cluster = d3.layout.cluster()
@@ -87,7 +91,7 @@ d3.json("data.json", function(error, data) {
   node.append("circle")
       .attr("r", function(d) {return Math.sqrt(scores[d.name]["population"] / 5000) + 4.5;})
 	  .on("mouseover", function(d) {node_onMouseOver(d);})
-	  .on("mouseout", function(d) {toolTip.transition().duration(500).style("opacity", "0");});
+	  //.on("mouseout", function(d) {toolTip.transition().duration(500).style("opacity", "0");});
 
   node.append("text")
       .attr("dx", -30)
@@ -102,11 +106,37 @@ d3.json("data.json", function(error, data) {
 	var x = d3.keys(scores[node.name]).sort();
 	var p = d3.select("#toolTip_charts").selectAll("div")
 		.data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
-	p.enter().append("div").attr("class", "toolTip_chart")
-	    .text(function(d) {return d;})
+	p.enter().append("div")
+	    .attr("class", "toolTip_chart")
+		.attr("id", function(d) {return "chart_" + d;})
+        .style("float", "left")
+	  .append("svg");
 	p.exit().remove();
 	toolTip.style("left", (d3.event.pageX + 15) + "px")
 	    .style("top", (d3.event.pageY - 75) + "px");
+	d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort().forEach(function (d) {
+	    nv.addGraph(function() {
+	      var chart = nv.models.pieChart()
+	          .x(function(d){ return d.key;})
+	          .y(function(d){ return d.y;})
+			  .color(d3.scale.category10().range())
+			  .width(200)
+			  .height(200)
+		      .showLegend(false);
+	      var datum = [];
+		  d3.map(scores[node.name][d])
+		  .forEach(function(k, v) {
+		    datum.push({key: k, y: v});
+	      });
+	      d3.select("#chart_" + d + " svg")
+	          .datum(datum)
+		    .transition()
+			  .attr('width', 200)
+			  .attr('height', 200)
+	          .call(chart);
+          return chart;
+	    });
+	});
   }
 
 });

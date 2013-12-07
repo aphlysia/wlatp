@@ -28,7 +28,7 @@
 	</div>
 </div>
 </div>
-<script src="d3.v3.min.js"></script>
+<script src="js/d3.v3.min.js"></script>
 <script>
 
 var width = 960,
@@ -88,6 +88,7 @@ d3.json("data.json", function(error, data) {
 	p.enter().append("div").attr("class", "toolTip_chart")
 	    .text(function(d) {return d;})
 	p.exit().remove();
+	//d3.select("#toolTip_gender").text("male: " + scores[node.name]["gender"]["male"] + ", female: " + scores[node.name]["gender"]["female"]);
 	toolTip.style("left", (d3.event.pageX + 15) + "px")
 	    .style("top", (d3.event.pageY - 75) + "px");
   }
@@ -98,6 +99,4 @@ d3.select(self.frameElement).style("height", height + "px");
 </script>
 </body>
 </html>
-
-
 

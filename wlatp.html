@@ -20,7 +20,7 @@
 
 </style>
 <body>
-<div id="body" style="position: absolute; top:80px">
+<div id="body" style="position: absolute;">
 <div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; width: 300px; padding: 10px;">
 	<div id="toolTip_header" class="tooltip_header"></div>
 	<div id="toolTip_population" class="tooltip_population"></div>
@@ -31,24 +31,41 @@
 <script src="js/d3.v3.min.js"></script>
 <script>
 
-var width = 960,
-    height = 900;
-
 var cluster = d3.layout.cluster()
-    .size([height, width - 200]);
+    .sort(function(a, b) {return d3.ascending(a.name, b.name);});
 
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
 var svg = d3.select("#body").append("svg")
-    .attr("width", width)
-    .attr("height", height)
   .append("g")
     .attr("transform", "translate(100,0)");
 
 d3.json("data.json", function(error, data) {
   tree = data.tree;
   scores = data.scores;
+  var maxDepth = 0;
+  var generations = {};
+  function countTreeSize(node, depth) {
+    depth += 1;
+	if (depth > maxDepth) {
+	  maxDepth = depth;
+	}
+	if (!(depth in generations)) {
+	  generations[depth] = 0;
+	}
+	generations[depth]++;
+	tree[node.name].forEach(function (n){countTreeSize(n, depth);});
+  }
+  countTreeSize(tree["root"][0], 0);
+  var width = maxDepth * 200;
+  var height = d3.max(d3.values(generations)) * 100;
+  cluster.size([height, width])
+      .sort(function(a, b) {return d3.ascending(a.name, b.name);});
+  d3.select("svg").attr("width", width + 500)
+      .attr("height", height);
+//  d3.select(self.frameElement).style("height", height + "px");
+
   cluster.children(function (node) {return tree[node.name];});
   var nodes = cluster.nodes(tree.root[0]);
   var links = cluster.links(nodes);
@@ -76,11 +93,11 @@ d3.json("data.json", function(error, data) {
       .attr("dx", -30)
       .attr("dy", 25)
       .style("text-anchor", "start")
-      .text(function(d) {return d.name;});
+      .text(function(d) {return decodeURI(d.name);});
 
   function node_onMouseOver(node) {
     toolTip.transition().duration(200).style("opacity", ".9");
-	d3.select("#toolTip_header").text(node.name);
+	d3.select("#toolTip_header").text(decodeURI(node.name));
 	d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
 	var x = d3.keys(scores[node.name]).sort();
 	var p = d3.select("#toolTip_charts").selectAll("div")
@@ -88,15 +105,15 @@ d3.json("data.json", function(error, data) {
 	p.enter().append("div").attr("class", "toolTip_chart")
 	    .text(function(d) {return d;})
 	p.exit().remove();
-	//d3.select("#toolTip_gender").text("male: " + scores[node.name]["gender"]["male"] + ", female: " + scores[node.name]["gender"]["female"]);
 	toolTip.style("left", (d3.event.pageX + 15) + "px")
 	    .style("top", (d3.event.pageY - 75) + "px");
   }
-});
 
-d3.select(self.frameElement).style("height", height + "px");
+});
 
 </script>
 </body>
 </html>
+
+
 

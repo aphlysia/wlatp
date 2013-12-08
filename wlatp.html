@@ -45,7 +45,18 @@ var svg = d3.select("#body").append("svg")
   .append("g")
     .attr("transform", "translate(100,0)");
 
+//ドラッグ時のイベントをセット
+var drag = d3.behavior.drag()
+  .on("drag", function(d,i) {
+      d.x += d3.event.dx
+      d.y += d3.event.dy
+      d3.select(this).attr("transform", function(d,i){
+          return "translate(" + [ d.x,d.y ] + ")"
+      })
+  });
+
 d3.json("data.json", function(error, data) {
+  
   tree = data.tree;
   scores = data.scores;
   var maxDepth = 0;
@@ -78,13 +89,16 @@ d3.json("data.json", function(error, data) {
       .data(links)
     .enter().append("path")
       .attr("class", "link")
-      .attr("d", diagonal);
+      .attr("d", diagonal)
+      .call(drag);
 
   var node = svg.selectAll(".node")
       .data(nodes)
-    .enter().append("g")
+      .enter()
+      .append("g")
       .attr("class", "node")
-      .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")";});
+      .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")";})
+      .call(drag);
 
   var toolTip = d3.select("#toolTip");
 
@@ -99,6 +113,13 @@ d3.json("data.json", function(error, data) {
       .attr("dy", 25)
       .style("text-anchor", "start")
       .text(function(d) {return decodeURI(d.name);});
+
+        
+  // function move(){
+  //     var parent = d3.select(this.parentNode);
+  //     parent.attr("x", function(){return d3.event.dx + parseInt(parent.attr("x"))})
+  //         .attr("y", function(){return d3.event.dy + parseInt(parent.attr("y"))});
+  // };
 
   function node_onMouseOver(node) {
     // read node data

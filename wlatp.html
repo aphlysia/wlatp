@@ -25,74 +25,99 @@
 <body>
 <div id="body" style="position: absolute;">
 <div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; padding: 10px;">
-	<div id="toolTip_header" class="tooltip_header"></div>
-	<div id="toolTip_population" class="tooltip_population"></div>
-	<div id="toolTip_charts" class="tooltip_charts">
-	</div>
+  <div id="toolTip_header" class="tooltip_header"></div>
+  <div id="toolTip_population" class="tooltip_population"></div>
+  <div id="toolTip_charts" class="tooltip_charts">
+  </div>
 </div>
 </div>
 <script src="js/d3.v3.min.js"></script>
 <script src="js/nv.d3.min.js"></script>
 <script>
 
-var cluster = d3.layout.cluster()
-    .sort(function(a, b) {return d3.ascending(a.name, b.name);});
+var cluster = d3.layout.cluster().sort(function(a, b) {return d3.ascending(a.name, b.name);});
 
-var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+var diagonal = d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("#body").append("svg")
-  .append("g")
-    .attr("transform", "translate(100,0)");
+var svg = d3.select("#body").append("svg").append("g").attr("transform", "translate(100,0)");
+
+//ドラッグ時のイベントをセット
+var drag = d3.behavior.drag().on("drag", function(d,i) {
+  d.x += d3.event.dx
+  d.y += d3.event.dy
+  d3.select(this).attr("transform", function(d,i){
+    return "translate(" + [ d.x,d.y ] + ")"
+  })
+});
 
 d3.json("data.json", function(error, data) {
-  tree = data.tree;
-  scores = data.scores;
+
+  var tree = data.tree;
+  var scores = data.scores;
   var maxDepth = 0;
   var generations = {};
+
   function countTreeSize(node, depth) {
     depth += 1;
-	if (depth > maxDepth) {
-	  maxDepth = depth;
-	}
-	if (!(depth in generations)) {
-	  generations[depth] = 0;
-	}
-	generations[depth]++;
-	tree[node.name].forEach(function (n){countTreeSize(n, depth);});
+    if (depth > maxDepth) {
+      maxDepth = depth;
+    }
+    if (!(depth in generations)) {
+      generations[depth] = 0;
+    }
+    generations[depth]++;
+    tree[node.name].forEach(function (n){countTreeSize(n, depth);});
   }
+
   countTreeSize(tree["root"][0], 0);
+
   var width = maxDepth * 200;
-  var height = d3.max(d3.values(generations)) * 100;
-  cluster.size([height, width])
-      .sort(function(a, b) {return d3.ascending(a.name, b.name);});
-  d3.select("svg").attr("width", width + 1000)
-      .attr("height", height);
+  var height = d3.max(d3.values(generations)) * 200;
+  
+  cluster.size([height, width]).sort(function(a, b) {return d3.ascending(a.name, b.name);});
+
+  d3.select("svg").attr("width", width + 1000).attr("height", height);
+
 //  d3.select(self.frameElement).style("height", height + "px");
 
   cluster.children(function (node) {return tree[node.name];});
+  
   var nodes = cluster.nodes(tree.root[0]);
   var links = cluster.links(nodes);
 
+  //失敗
   var link = svg.selectAll(".link")
       .data(links)
-    .enter().append("path")
+      .enter()
+      .append("path")
       .attr("class", "link")
-      .attr("d", diagonal);
+      .attr("d", diagonal)
+      .call(drag);
 
+  //一部成功
   var node = svg.selectAll(".node")
       .data(nodes)
-    .enter().append("g")
+      .enter()
+      .append("g")
       .attr("class", "node")
-      .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")";});
+      .attr("transform", function(d) {return "translate(" + d.y + "," + d.x + ")";})
+      .call(drag);
 
   var toolTip = d3.select("#toolTip");
 
   node.append("circle")
       .attr("r", function(d) {return Math.sqrt(scores[d.name]["population"] / 5000) + 4.5;})
-	  .on("mouseover", function(d) {node_onMouseOver(d);})
+      .on("mouseover", function(d) {node_onMouseOver(d);});
+
   d3.select("body")
-	  .on("keydown", function(e) {toolTip.transition().duration(200).style("opacity", "0").transition().style("left", "-10000px").style("top", "-1000px");});
+    .on("keydown", function(e) {
+      toolTip.transition()
+      .duration(200)
+      .style("opacity", "0")
+      .transition()
+      .style("left", "-10000px")
+      .style("top", "-1000px");
+    });
 
   node.append("text")
       .attr("dx", -30)
@@ -103,47 +128,57 @@ d3.json("data.json", function(error, data) {
   function node_onMouseOver(node) {
     // read node data
     toolTip.transition().duration(200).style("opacity", ".9");
-	d3.select("#toolTip_header").text(decodeURI(node.name));
-	d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
-	var x = d3.keys(scores[node.name]).sort();
-	var p = d3.select("#toolTip_charts").selectAll("div")
-		.data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
-	p.enter().append("div")
-	    .attr("class", "toolTip_chart")
-		.attr("id", function(d) {return "chart_" + d;})
-        .style("float", "left")
-	  .append("svg");
-	p.exit().remove();
+    
+    d3.select("#toolTip_header").text(decodeURI(node.name));
+    
+    d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
+    
+    var x = d3.keys(scores[node.name]).sort();
+    
+    var p = d3.select("#toolTip_charts").selectAll("div")
+      .data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
 
-	// draw pie charts
-	d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort().forEach(function (d) {
-	    nv.addGraph(function() {
-	      var chart = nv.models.pieChart()
-	          .x(function(d){ return d.key;})
-	          .y(function(d){ return d.y;})
-			  .color(d3.scale.category10().range())
-			  .width(200)
-			  .height(200)
-		      .showLegend(false);
-	      var datum = [];
-		  d3.map(scores[node.name][d])
-		  .forEach(function(k, v) {
-		    datum.push({key: k, y: v});
-	      });
-	      d3.select("#chart_" + d + " svg")
-	          .datum(datum)
-		    .transition()
-			  .attr('width', 200)
-			  .attr('height', 200)
-	          .call(chart);
+    p.enter()
+      .append("div")
+      .attr("class", "toolTip_chart")
+      .attr("id", function(d) {return "chart_" + d;})
+      .style("float", "left")
+      .append("svg");
+
+    p.exit().remove();
+
+    // draw pie charts
+    d3.keys(scores[node.name])
+      .filter(function(x) {return x == "population"? false: true;})
+      .sort()
+      .forEach(function (d) {
+        nv.addGraph(function() {
+          var chart = nv.models.pieChart()
+            .x(function(d){ return d.key;})
+            .y(function(d){ return d.y;})
+            .color(d3.scale.category10().range())
+            .width(200)
+            .height(200)
+            .showLegend(false);
+          var datum = [];
+          d3.map(scores[node.name][d])
+            .forEach(function(k, v) {
+              datum.push({key: k, y: v});
+            });
+          d3.select("#chart_" + d + " svg")
+            .datum(datum)
+            .transition()
+            .attr('width', 200)
+            .attr('height', 200)
+            .call(chart);
           return chart;
-	    });
-	});
+        });
+      });
 
-	// locate
-	toolTip.style("left", (d3.event.pageX + 15) + "px")
-	    .style("top", (d3.event.pageY - 75) + "px");
-  }
+    // locate
+    toolTip.style("left", (d3.event.pageX + 15) + "px").style("top", (d3.event.pageY - 75) + "px");
+
+  } // node_onMouseOver function end
 
 });
 

@@ -1,8 +1,8 @@
 {
   "description": {"domain": "amazon.co.jp", "start": "2013-10-01", "end": "2013-10-31"},
   "tree": {
-    "root": [{"name": "amazon.co.jp"}],
-    "amazon.co.jp": [{"name": "www.amazon.co.jp"}],
+    "root": [{"name": "total"}],
+	"total": [{"name": "www.amazon.co.jp"}],
 	"www.amazon.co.jp": [{"name": "www.amazon.co.jp/gp"}, {"name": "www.amazon.co.jp/In-English"}, {"name": "www.amazon.co.jp/%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%BB%E3%83%BC%E3%83%AB"}, {"name": "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88"}],
     "www.amazon.co.jp/gp": [{"name": "www.amazon.co.jp/gp/bestsellers"}],
     "www.amazon.co.jp/gp/bestsellers": [{"name": "www.amazon.co.jp/gp/bestsellers/books"}],
@@ -12,7 +12,7 @@
     "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88": []
   },
   "scores": {
-    "amazon.co.jp": {"population": 20000000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
+    "total": {"population": 20000000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
     "www.amazon.co.jp": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
     "www.amazon.co.jp/%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%BB%E3%83%BC%E3%83%AB": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
     "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},

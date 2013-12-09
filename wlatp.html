@@ -25,7 +25,7 @@
 <body>
 <div id="body" style="position: absolute;">
 <div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; padding: 10px;">
-  <div id="toolTip_header" class="tooltip_header"></div>
+  <div id="toolTip_header" class="tooltip_header"><a></a></div>
   <div id="toolTip_population" class="tooltip_population"></div>
   <div id="toolTip_charts" class="tooltip_charts">
   </div>
@@ -57,19 +57,24 @@ d3.json("data.json", function(error, data) {
   var maxDepth = 0;
   var generations = {};
 
-  function countTreeSize(node, depth) {
-    depth += 1;
-    if (depth > maxDepth) {
-      maxDepth = depth;
+  var queue = [{"node": tree["root"][0], "depth": 0}];
+  var checker = {};
+  while (queue.length > 0) {
+    var x = queue.pop();
+    var depth = x["depth"] + 1;
+  	if (depth > maxDepth) {
+  	  maxDepth = depth;
+  	}
+  	if (!(depth in generations)) {
+  	  generations[depth] = 0;
+  	}
+  	generations[depth]++;
+    var node_name = x["node"].name;
+    if (!(node_name in checker)) {
+      checker[node_name] = 1;
     }
-    if (!(depth in generations)) {
-      generations[depth] = 0;
-    }
-    generations[depth]++;
-    tree[node.name].forEach(function (n){countTreeSize(n, depth);});
+    tree[x["node"].name].forEach(function (n) {queue.push({"node": n, "depth": depth});});
   }
-
-  countTreeSize(tree["root"][0], 0);
 
   var width = maxDepth * 200;
   var height = d3.max(d3.values(generations)) * 200;
@@ -129,11 +134,15 @@ d3.json("data.json", function(error, data) {
     // read node data
     toolTip.transition().duration(200).style("opacity", ".9");
     
-    d3.select("#toolTip_header").text(decodeURI(node.name));
+    if (node.name != 'total') {
+      d3.select("#toolTip_header a").attr("href", "http://" + node.name).text(decodeURI(node.name));
+    } else {
+      d3.select("#toolTip_header a").attr("href", "#").text(decodeURI(node.name));
+    }
     
     d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
     
-    var x = d3.keys(scores[node.name]).sort();
+    var x = d3.keys(scores[node.name]);
     
     var p = d3.select("#toolTip_charts").selectAll("div")
       .data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());

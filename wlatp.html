@@ -25,10 +25,10 @@
 <body>
 <div id="body" style="position: absolute;">
 <div id="toolTip" class="tooltip" style="position: absolute; opacity:0; background: #FFFFFF; border: 1px solid #D5D5D5; border-radius: 3px; box-shadow: 1px 1px 3px #000; padding: 10px;">
-	<div id="toolTip_header" class="tooltip_header"></div>
-	<div id="toolTip_population" class="tooltip_population"></div>
-	<div id="toolTip_charts" class="tooltip_charts">
-	</div>
+  <div id="toolTip_header" class="tooltip_header"></div>
+  <div id="toolTip_population" class="tooltip_population"></div>
+  <div id="toolTip_charts" class="tooltip_charts">
+  </div>
 </div>
 </div>
 <script src="js/d3.v3.min.js"></script>
@@ -59,14 +59,14 @@ d3.json("data.json", function(error, data) {
 
   function countTreeSize(node, depth) {
     depth += 1;
-  	if (depth > maxDepth) {
-  	  maxDepth = depth;
-  	}
-  	if (!(depth in generations)) {
-  	  generations[depth] = 0;
-  	}
-  	generations[depth]++;
-  	tree[node.name].forEach(function (n){countTreeSize(n, depth);});
+    if (depth > maxDepth) {
+      maxDepth = depth;
+    }
+    if (!(depth in generations)) {
+      generations[depth] = 0;
+    }
+    generations[depth]++;
+    tree[node.name].forEach(function (n){countTreeSize(n, depth);});
   }
 
   countTreeSize(tree["root"][0], 0);
@@ -110,7 +110,7 @@ d3.json("data.json", function(error, data) {
       .on("mouseover", function(d) {node_onMouseOver(d);});
 
   d3.select("body")
-	  .on("keydown", function(e) {
+    .on("keydown", function(e) {
       toolTip.transition()
       .duration(200)
       .style("opacity", "0")
@@ -128,34 +128,34 @@ d3.json("data.json", function(error, data) {
   function node_onMouseOver(node) {
     // read node data
     toolTip.transition().duration(200).style("opacity", ".9");
-  	
+    
     d3.select("#toolTip_header").text(decodeURI(node.name));
-  	
+    
     d3.select("#toolTip_population").text("population: " + scores[node.name]["population"]);
-  	
+    
     var x = d3.keys(scores[node.name]).sort();
-  	
+    
     var p = d3.select("#toolTip_charts").selectAll("div")
-  		.data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
+      .data(d3.keys(scores[node.name]).filter(function(x) {return x == "population"? false: true;}).sort());
 
-  	p.enter()
+    p.enter()
       .append("div")
-	    .attr("class", "toolTip_chart")
-  		.attr("id", function(d) {return "chart_" + d;})
+      .attr("class", "toolTip_chart")
+      .attr("id", function(d) {return "chart_" + d;})
       .style("float", "left")
-  	  .append("svg");
+      .append("svg");
 
-  	p.exit().remove();
+    p.exit().remove();
 
-  	// draw pie charts
-  	d3.keys(scores[node.name])
+    // draw pie charts
+    d3.keys(scores[node.name])
       .filter(function(x) {return x == "population"? false: true;})
       .sort()
       .forEach(function (d) {
         nv.addGraph(function() {
           var chart = nv.models.pieChart()
-	          .x(function(d){ return d.key;})
-	          .y(function(d){ return d.y;})
+            .x(function(d){ return d.key;})
+            .y(function(d){ return d.y;})
             .color(d3.scale.category10().range())
             .width(200)
             .height(200)
@@ -166,17 +166,17 @@ d3.json("data.json", function(error, data) {
               datum.push({key: k, y: v});
             });
           d3.select("#chart_" + d + " svg")
-	          .datum(datum)
+            .datum(datum)
             .transition()
             .attr('width', 200)
             .attr('height', 200)
-	          .call(chart);
+            .call(chart);
           return chart;
         });
       });
 
-  	// locate
-  	toolTip.style("left", (d3.event.pageX + 15) + "px").style("top", (d3.event.pageY - 75) + "px");
+    // locate
+    toolTip.style("left", (d3.event.pageX + 15) + "px").style("top", (d3.event.pageY - 75) + "px");
 
   } // node_onMouseOver function end
 

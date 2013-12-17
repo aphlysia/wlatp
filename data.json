@@ -12,10 +12,10 @@
     "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88": []
   },
   "scores": {
-    "total": {"population": 20000000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
+    "total": {"population": 20000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
     "www.amazon.co.jp": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
     "www.amazon.co.jp/%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%BB%E3%83%BC%E3%83%AB": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
-    "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 0.9, "30-39": 0.1}},
+    "www.amazon.co.jp/Amazon%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88": {"population": 1000000, "gender": {"male": 0.5, "female": 0.5}, "age": {"20-29": 1}},
     "www.amazon.co.jp/gp": {"population": 100000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
     "www.amazon.co.jp/gp/bestsellers": {"population": 100000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},
     "www.amazon.co.jp/gp/bestsellers/books": {"population": 100000, "gender": {"male": 0.4, "female": 0.6}, "age": {"20-29": 0.3, "30-39": 0.4, "40-49": 0.3}},

@@ -109,9 +109,20 @@ d3.json("data.json", function(error, data) {
       .call(drag);
 
   var toolTip = d3.select("#toolTip");
+  var colorScale = d3.interpolateHsl(d3.hsl("hsl(200, 78%, 63%)"), d3.hsl("hsl(360, 78%, 63%)"));
 
   node.append("circle")
       .attr("r", function(d) {return Math.sqrt(scores[d.name]["population"] / 5000) + 4.5;})
+      .style("stroke", function(d) {
+          var max = 0;
+          d3.keys(scores[d.name]).filter(function(x) {return x == "population"? false: true;})
+              .forEach(function (z) {
+                  total = d3.sum(d3.values(scores[d.name][z]));
+                  d3.values(scores[d.name][z]).forEach(function(a) {if (a / total > max) max = a / total;});
+              });
+          return colorScale(-2.5 * (max - 0.5));
+      })
+      .style("stroke-width", "3px")
       .on("mouseover", function(d) {node_onMouseOver(d);});
 
   d3.select("body")

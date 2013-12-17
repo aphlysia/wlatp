@@ -62,13 +62,13 @@ d3.json("data.json", function(error, data) {
   while (queue.length > 0) {
     var x = queue.pop();
     var depth = x["depth"] + 1;
-  	if (depth > maxDepth) {
-  	  maxDepth = depth;
-  	}
-  	if (!(depth in generations)) {
-  	  generations[depth] = 0;
-  	}
-  	generations[depth]++;
+    if (depth > maxDepth) {
+      maxDepth = depth;
+    }
+    if (!(depth in generations)) {
+      generations[depth] = 0;
+    }
+    generations[depth]++;
     var node_name = x["node"].name;
     if (!(node_name in checker)) {
       checker[node_name] = 1;
